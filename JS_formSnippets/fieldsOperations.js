@@ -12,7 +12,7 @@ showHideField($('#' + attributeId));
 showHideField($('#new_accountid'), false);
 const showHideField = (fieldElement, isVisible = true) => {
     // complete control contains plenty of elements and cotrol itself is not the top
-    let fieldControl = $(fieldElement).parents('.control').parent().parent();
+    let fieldControl = $(fieldElement).closest('.control').parent().parent();
 
     if (isVisible)
         fieldControl.show();
@@ -83,3 +83,24 @@ const getActivities = () => {
             .fail(deferredAjax.reject); //ajax
     });
 }
+
+// --- manipulation with the group of elements which should be changed after attribute changes
+// Use mutation observer in the form - relove style of needed elements every time when they attributes changed
+$(function () {
+
+    let validateControls = $("[id^='MaximumLengthValidator']"); // any selector could be
+    
+    validateControls.each((indx, el) => {
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === "style") {
+                    console.log("Style attribute changed for Element ID: ", mutation.target.id);
+                    $(el).removeAttr('style');
+                }
+            });
+        });
+        
+        observer.observe(el, { attributes: true });
+        //$(el).removeAttr('style'); // do remove of style elements
+    });
+});
